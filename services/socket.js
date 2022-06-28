@@ -1,7 +1,7 @@
-const Room = require('./helpers/Room');
-const Peer = require('./helpers/Peer');
+const Room = require('../helpers/Room');
+const Peer = require('../helpers/Peer');
 
-const getMediasoupWorker = require('./mediasoupInit');
+const getMediasoupWorker = require('./mediasoup');
 
 module.exports = (io) => {
   const roomList = new Map();

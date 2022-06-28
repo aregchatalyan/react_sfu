@@ -9,8 +9,8 @@ let httpServer;
 
 const app = express();
 
-const socket = require('./socket');
 const config = require('./config');
+const socket = require('./services/socket');
 
 if (process.env.NODE_ENV === 'production') {
   protocol = 'http';
@@ -29,7 +29,7 @@ httpServer.listen(config.listenPort, () => {
   console.log(`Open ${protocol}://${config.listenIp}:${config.listenPort}`);
 });
 
-socket(new Server(httpServer));
+socket(new Server(httpServer, { cors: { origin: '*' } }));
 
 process.on('uncaughtException', err => {
   console.error(`Caught exception: ${err}`);

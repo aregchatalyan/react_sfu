@@ -1,0 +1,27 @@
+.control {
+  width: fit-content;
+  margin: 0 auto;
+
+  button {
+    margin: 2px;
+
+    border: none;
+    line-height: 0;
+    border-radius: 4px;
+    background-color: white;
+
+    div {
+      width: 20px;
+      height: 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  i {
+    color: blue;
+    font-size: 1rem;
+  }
+}

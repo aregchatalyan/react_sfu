@@ -23,12 +23,36 @@
 
     input {
       width: 100%;
+      padding: 4px;
       outline: none;
       margin-bottom: 5px;
     }
 
     button {
       width: 100%;
+      border: none;
+      line-height: 0;
+      padding: 3.5px 0;
+      border-radius: 4px;
+      background-color: black;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      div {
+        width: 20px;
+        height: 20px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    i {
+      color: white;
+      font-size: 1rem;
     }
   }
 }

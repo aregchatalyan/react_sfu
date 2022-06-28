@@ -1,8 +1,8 @@
 const os = require('os');
 const fs = require('fs');
+const path = require('path');
 const util = require('util');
-const child_process = require('child_process');
-const exec = util.promisify(child_process.exec);
+const exec = util.promisify(require('child_process').exec);
 
 const faces = os.networkInterfaces();
 
@@ -20,12 +20,12 @@ const getLocalIp = () => {
 
 const paths = [
   {
-    key_file: `${__dirname}/ssl/key.pem`,
-    cert_file: `${__dirname}/ssl/cert.pem`
+    key_file: path.join(__dirname, '..', 'ssl', 'key.pem'),
+    cert_file: path.join(__dirname, '..', 'ssl', 'cert.pem')
   },
   {
-    key_file: `${__dirname}/client/src/services/ssl/key.pem`,
-    cert_file: `${__dirname}/client/src/services/ssl/cert.pem`
+    key_file: path.join(__dirname, '..', 'client', 'src', 'ssl', 'key.pem'),
+    cert_file: path.join(__dirname, '..', 'client', 'src', 'ssl', 'cert.pem')
   }
 ];
 

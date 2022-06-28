@@ -1,4 +1,4 @@
-export const Events = {
+export const EventTypes = {
   exitRoom: 'exitRoom',
   openRoom: 'openRoom',
   startVideo: 'startVideo',
