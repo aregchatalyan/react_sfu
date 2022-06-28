@@ -327,8 +327,6 @@ export default class RoomClient {
         elem.setAttribute('playsinline', 'true');
         elem.setAttribute('autoplay', 'true');
         elem.setAttribute('muted', 'true');
-        // elem.className = 'vid';
-        console.log(elem, this.localMediaEl)
         const localVideoEl = document.getElementById(this.localMediaEl);
         localVideoEl.appendChild(elem);
         this.handleFS(elem.id);

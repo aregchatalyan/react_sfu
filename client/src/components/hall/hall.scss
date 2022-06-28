@@ -1,0 +1,25 @@
+#media {
+  //height: 100vh;
+  //position: relative;
+}
+
+#local-video {
+  display: flex;
+  border-radius: 4px;
+  background-color: black;
+
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+
+  video {
+    height: 160px;
+    border-radius: 4px;
+  }
+}
+
+#remote-videos {
+  video {
+    height: 240px;
+  }
+}

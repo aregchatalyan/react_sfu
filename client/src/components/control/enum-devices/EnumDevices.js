@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './enum-devices.scss';
 
-const EnumDevices = () => {
+const EnumDevices = ({ audioSelRef, videoSelRef, style }) => {
   const devicesRef = useRef([]);
-  const audioSelRef = useRef(null);
-  const videoSelRef = useRef(null);
+  // const audioSelRef = useRef(null);
+  // const videoSelRef = useRef(null);
 
   const [ isEnumDevices, setIsEnumDevices ] = useState(false);
 
@@ -45,7 +45,7 @@ const EnumDevices = () => {
   }, [ initEnumDevices ]);
 
   return (
-    <div className="enum-devices">
+    <div className="enum-devices" style={style}>
       <div>
         <div className="icon">
           <i className="fas fa-microphone"/>

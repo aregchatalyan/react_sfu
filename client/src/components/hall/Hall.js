@@ -1,4 +1,5 @@
 import React from 'react';
+import './hall.scss';
 
 const Hall = () => {
   return (

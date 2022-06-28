@@ -1,11 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import './controll.scss';
 
 import EnumDevices from './enum-devices/EnumDevices';
 
+import { MediaTypes } from '../../services/constants';
 import { RoomContext } from '../../context/RoomContext';
 
 const Control = ({ setShowForm }) => {
+  const audioSelRef = useRef(null);
+  const videoSelRef = useRef(null);
+
   const roomContext = useContext(RoomContext);
 
   const [ showDevices, setShowDevices ] = useState(false);
@@ -13,6 +17,7 @@ const Control = ({ setShowForm }) => {
 
   const onExit = () => {
     setShowForm(true);
+    roomContext.exit()
   }
 
   const onDevices = () => {
@@ -22,16 +27,23 @@ const Control = ({ setShowForm }) => {
 
   const onMicrophone = () => {
     setOnOff({ ...onOff, mic: !onOff.mic });
-    roomContext.produce('audioType', 'default')
+    onOff.mic
+      ? roomContext.closeProducer(MediaTypes.audio, audioSelRef.current.value)
+      : roomContext.produce(MediaTypes.audio, audioSelRef.current.value);
   }
 
   const onCamera = () => {
     setOnOff({ ...onOff, cam: !onOff.cam });
-    roomContext.produce('videoType', '898c5d7abe1d8efde91eaa915cf64624faf364c41600d04b52e97b3c4a991d8a')
+    onOff.cam
+      ? roomContext.closeProducer(MediaTypes.video, videoSelRef.current.value)
+      : roomContext.produce(MediaTypes.video, videoSelRef.current.value);
   }
 
   const onDesktop = () => {
     setOnOff({ ...onOff, desk: !onOff.desk });
+    onOff.desk
+      ? roomContext.closeProducer(MediaTypes.screen)
+      : roomContext.produce(MediaTypes.screen);
   }
 
   return (
@@ -67,7 +79,7 @@ const Control = ({ setShowForm }) => {
         </div>
       </button>
 
-      {showDevices && <EnumDevices/>}
+      <EnumDevices {...{audioSelRef, videoSelRef}} style={{ display: showDevices ? 'block' : 'none' }}/>
     </div>
   );
 };
