@@ -1,25 +1,38 @@
 #media {
-  //height: 100vh;
-  //position: relative;
+  position: relative;
+  background-color: #2f2f2f;
+
+  video {
+    cursor: pointer;
+  }
 }
 
 #local-video {
   display: flex;
   border-radius: 4px;
-  background-color: black;
 
   position: absolute;
-  right: 1px;
-  bottom: 1px;
+  right: 4px;
+  bottom: 4px;
 
   video {
     height: 160px;
+    border: 2px solid white;
     border-radius: 4px;
   }
 }
 
 #remote-videos {
+  height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+
   video {
-    height: 240px;
+    height: 100%;
+    //width: 33.33%;
+    //height: 50%;
+    //object-fit: fill;
   }
 }

@@ -32,16 +32,18 @@ socket.request = (type, data = {}) => new Promise((resolve, reject) => {
 const App = () => {
   const [ room, setRoom ] = useState({});
   const [ showForm, setShowForm ] = useState(true);
-  const [ form, setForm ] = useState({ room_id: '', user_id: '' });
+  const [ form, setForm ] = useState({ room_id: '1', user_id: `user${Math.floor(Math.random() * 101)}` });
 
   return (
     <div>
-      {showForm && <Login {...{ form, setForm, setShowForm, socket, setRoom }}/>}
-
-      <RoomContext.Provider value={room}>
-        {!showForm && <Control {...{ setShowForm }}/>}
-        {!showForm && <Hall {...{}}/>}
-      </RoomContext.Provider>
+      {showForm
+        ? (<Login {...{ form, setForm, setShowForm, setRoom, socket }}/>)
+        : (
+          <RoomContext.Provider value={room}>
+            <Control {...{ setShowForm }}/>
+            <Hall {...{}}/>
+          </RoomContext.Provider>
+        )}
     </div>
   );
 }

@@ -21,9 +21,13 @@ if (process.env.NODE_ENV === 'production') {
     key: config.sslKey,
     cert: config.sslCrt
   }, app);
-}
 
-app.use(express.static(path.join(__dirname, 'client')));
+  app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 httpServer.listen(config.listenPort, () => {
   console.log(`Open ${protocol}://${config.listenIp}:${config.listenPort}`);

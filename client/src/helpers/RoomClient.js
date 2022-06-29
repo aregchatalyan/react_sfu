@@ -1,6 +1,6 @@
 import * as mediasoupClient from 'mediasoup-client';
 
-import { MediaTypes, EventTypes } from '../services/constants';
+import { MediaTypes } from '../services/constants';
 
 let producer;
 
@@ -29,12 +29,6 @@ export default class RoomClient {
     this.producerLabel = new Map();
 
     this._isOpen = false;
-    this.eventListeners = new Map();
-
-    Object.keys(EventTypes).forEach(function (evt) {
-        this.eventListeners.set(evt, []);
-      }.bind(this)
-    );
 
     this.createRoom(room_id).then(async function () {
         await this.join(name, room_id);
@@ -257,9 +251,6 @@ export default class RoomClient {
               ideal: 720
             },
             deviceId: deviceId,
-            // aspectRatio: {
-            //     ideal: 1.7777777778
-            // }
           }
         };
         break;
@@ -327,8 +318,7 @@ export default class RoomClient {
         elem.setAttribute('playsinline', 'true');
         elem.setAttribute('autoplay', 'true');
         elem.setAttribute('muted', 'true');
-        const localVideoEl = document.getElementById(this.localMediaEl);
-        localVideoEl.appendChild(elem);
+        document.getElementById(this.localMediaEl).appendChild(elem);
         this.handleFS(elem.id);
       }
 
@@ -359,20 +349,6 @@ export default class RoomClient {
       });
 
       this.producerLabel.set(type, producer.id);
-
-      switch (type) {
-        case MediaTypes.audio:
-          this.event(EventTypes.startAudio);
-          break;
-        case MediaTypes.video:
-          this.event(EventTypes.startVideo);
-          break;
-        case MediaTypes.screen:
-          this.event(EventTypes.startScreen);
-          break;
-        default:
-          return;
-      }
     } catch (err) {
       console.log('Produce error:', err);
     }
@@ -394,7 +370,7 @@ export default class RoomClient {
           elem.setAttribute('autoplay', 'true');
           elem.setAttribute('muted', 'true');
           elem.className = 'vid';
-          this.remoteVideoEl.appendChild(elem);
+          document.getElementById(this.remoteVideoEl).appendChild(elem);
           this.handleFS(elem.id);
         } else {
           elem = document.createElement('audio');
@@ -402,7 +378,7 @@ export default class RoomClient {
           elem.id = consumer.id;
           elem.playsinline = false;
           elem.autoplay = true;
-          this.remoteAudioEl.appendChild(elem);
+          document.getElementById(this.remoteAudioEl).appendChild(elem);
         }
 
         consumer.on('trackended', function () {
@@ -468,20 +444,6 @@ export default class RoomClient {
       });
       elem.parentNode.removeChild(elem);
     }
-
-    switch (type) {
-      case MediaTypes.audio:
-        this.event(EventTypes.stopAudio);
-        break;
-      case MediaTypes.video:
-        this.event(EventTypes.stopVideo);
-        break;
-      case MediaTypes.screen:
-        this.event(EventTypes.stopScreen);
-        break;
-      default:
-        return;
-    }
   }
 
   removeConsumer(consumer_id) {
@@ -512,43 +474,15 @@ export default class RoomClient {
         .finally(
           function () {
             clean();
-          }.bind(this)
+          }
         );
     } else {
       clean();
     }
-
-    this.event(EventTypes.exitRoom);
   }
-
-  ///////  HELPERS //////////
-
-  // async roomInfo() {
-  //     return await this.socket.request('getMyRoomInfo')
-  // }
-
-  static get mediaType() {
-    return MediaTypes;
-  }
-
-  event(evt) {
-    if (this.eventListeners.has(evt)) {
-      this.eventListeners.get(evt).forEach((callback) => callback());
-    }
-  }
-
-  on(evt, callback) {
-    this.eventListeners.get(evt).push(callback);
-  }
-
-  //////// GETTERS ////////
 
   isOpen() {
     return this._isOpen;
-  }
-
-  static get EVENTS() {
-    return EventTypes;
   }
 
   //////// UTILITY ////////

@@ -3,7 +3,7 @@ import './login.scss';
 
 import RoomClient from '../../helpers/RoomClient';
 
-const Login = ({ form, setForm, setShowForm, socket, setRoom }) => {
+const Login = ({ form, setForm, setShowForm, setRoom, socket }) => {
   const onFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onJoinRoom = () => {
@@ -33,6 +33,7 @@ const Login = ({ form, setForm, setShowForm, socket, setRoom }) => {
         <input
           type="text"
           name="room_id"
+          value={form.room_id}
           className="room-input"
           autoComplete="off"
           placeholder="Room"
@@ -41,6 +42,7 @@ const Login = ({ form, setForm, setShowForm, socket, setRoom }) => {
         <input
           type="text"
           name="user_id"
+          value={form.user_id}
           className="user-input"
           autoComplete="off"
           placeholder="User"
