@@ -5,8 +5,8 @@ import { MediaTypes } from '../services/constants';
 let producer;
 
 export default class RoomClient {
-  constructor(localMediaEl, remoteVideoEl, remoteAudioEl, socket, room_id, name) {
-    this.name = name;
+  constructor(localMediaEl, remoteVideoEl, remoteAudioEl, socket, room_id, username) {
+    this.username = username;
     this.localMediaEl = localMediaEl;
     this.remoteVideoEl = remoteVideoEl;
     this.remoteAudioEl = remoteAudioEl;
@@ -31,7 +31,7 @@ export default class RoomClient {
     this._isOpen = false;
 
     this.createRoom(room_id).then(async function () {
-        await this.join(name, room_id);
+        await this.join(username, room_id);
         this.initSockets();
         this._isOpen = true;
       }.bind(this)
@@ -50,12 +50,9 @@ export default class RoomClient {
       });
   }
 
-  async join(name, room_id) {
+  async join(username, room_id) {
     this.socket
-      .request('join', {
-        name,
-        room_id
-      })
+      .request('join', { username, room_id })
       .then(async function (e) {
           console.log('Joined to room', e);
           const data = await this.socket.request('getRouterRtpCapabilities');

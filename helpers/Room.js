@@ -56,13 +56,13 @@ module.exports = class Room {
 
     transport.on('dtlsstatechange', function (dtlsState) {
         if (dtlsState === 'closed') {
-          console.log('Transport close', { name: this.peers.get(socket_id).name });
+          console.log('Transport close', { username: this.peers.get(socket_id).username });
           transport.close();
         }
       }.bind(this)
     );
 
-    transport.on('close', () => console.log('Transport close', { name: this.peers.get(socket_id).name }));
+    transport.on('close', () => console.log('Transport close', { username: this.peers.get(socket_id).username }));
 
     console.log('Adding transport', { transportId: transport.id });
 
@@ -115,7 +115,7 @@ module.exports = class Room {
 
     consumer.on('producerclose', function () {
         console.log('Consumer closed due to producerclose event', {
-          name: `${this.peers.get(socket_id).name}`,
+          username: `${this.peers.get(socket_id).username}`,
           consumer_id: `${consumer.id}`
         });
 
@@ -138,14 +138,14 @@ module.exports = class Room {
     this.peers.get(socket_id).closeProducer(producer_id);
   }
 
-  broadCast(socket_id, name, data) {
+  broadCast(socket_id, username, data) {
     for (let otherID of Array.from(this.peers.keys()).filter((id) => id !== socket_id)) {
-      this.send(otherID, name, data);
+      this.send(otherID, username, data);
     }
   }
 
-  send(socket_id, name, data) {
-    this.io.to(socket_id).emit(name, data);
+  send(socket_id, username, data) {
+    this.io.to(socket_id).emit(username, data);
   }
 
   getPeers() {

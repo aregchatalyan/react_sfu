@@ -7,7 +7,7 @@ const Login = ({ form, setForm, setShowForm, setRoom, socket }) => {
   const onFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onJoinRoom = () => {
-    if (!form.room_id || !form.user_id) return;
+    if (!form.room_id || !form.username) return;
 
     let rc = null;
 
@@ -19,7 +19,7 @@ const Login = ({ form, setForm, setShowForm, setRoom, socket }) => {
       'remote-audios',
       socket,
       form.room_id,
-      form.user_id
+      form.username
     );
 
     setRoom(rc);
@@ -41,8 +41,8 @@ const Login = ({ form, setForm, setShowForm, setRoom, socket }) => {
 
         <input
           type="text"
-          name="user_id"
-          value={form.user_id}
+          name="username"
+          value={form.username}
           className="user-input"
           autoComplete="off"
           placeholder="User"

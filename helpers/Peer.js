@@ -1,7 +1,7 @@
 module.exports = class Peer {
-  constructor(socket_id, name) {
+  constructor(socket_id, username) {
     this.id = socket_id;
-    this.name = name;
+    this.username = username;
     this.transports = new Map();
     this.consumers = new Map();
     this.producers = new Map();
@@ -26,7 +26,7 @@ module.exports = class Peer {
     this.producers.set(producer.id, producer);
 
     producer.on('transportclose', function () {
-        console.log('Producer transport close', { name: `${this.name}`, consumer_id: `${producer.id}` });
+        console.log('Producer transport close', { username: `${this.username}`, consumer_id: `${producer.id}` });
         producer.close();
         this.producers.delete(producer.id);
       }.bind(this)
@@ -62,7 +62,7 @@ module.exports = class Peer {
 
     consumer.on('transportclose',
       function () {
-        console.log('Consumer transport close', { name: `${this.name}`, consumer_id: `${consumer.id}` });
+        console.log('Consumer transport close', { username: `${this.username}`, consumer_id: `${consumer.id}` });
         this.consumers.delete(consumer.id);
       }.bind(this)
     );

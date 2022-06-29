@@ -32,7 +32,7 @@ socket.request = (type, data = {}) => new Promise((resolve, reject) => {
 const App = () => {
   const [ room, setRoom ] = useState({});
   const [ showForm, setShowForm ] = useState(true);
-  const [ form, setForm ] = useState({ room_id: '1', user_id: `user${Math.floor(Math.random() * 101)}` });
+  const [ form, setForm ] = useState({ room_id: '1', username: `user${Math.floor(Math.random() * 101)}` });
 
   return (
     <div>
