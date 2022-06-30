@@ -4,6 +4,9 @@
   margin: 10px auto;
   border-radius: 4px;
   border: 1px solid black;
+  background-color: black;
+
+  transition: opacity 1s;
 
   position: absolute;
   top: 20px;
@@ -13,6 +16,7 @@
 
   > div {
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
 
@@ -22,7 +26,11 @@
 
   select {
     width: 220px;
+    color: white;
+    padding: 2px;
     font-weight: bold;
+    border-radius: 2px;
+    background-color: black;
   }
 
   .icon {
@@ -34,7 +42,7 @@
     justify-content: center;
 
     i {
-      color: blue;
+      color: white;
       font-size: 1rem;
     }
   }

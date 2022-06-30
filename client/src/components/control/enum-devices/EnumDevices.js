@@ -3,8 +3,6 @@ import './enum-devices.scss';
 
 const EnumDevices = ({ audioSelRef, videoSelRef, style }) => {
   const devicesRef = useRef([]);
-  // const audioSelRef = useRef(null);
-  // const videoSelRef = useRef(null);
 
   const [ isEnumDevices, setIsEnumDevices ] = useState(false);
 
@@ -16,29 +14,25 @@ const EnumDevices = ({ audioSelRef, videoSelRef, style }) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-      await enumerateDevices();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+
+      devices.forEach((device) => {
+        if (device.kind === 'audioinput' || device.kind === 'videoinput') {
+          devicesRef.current.push({
+            type: device.kind,
+            value: device.deviceId,
+            label: device.label,
+          });
+        }
+
+        setIsEnumDevices(true);
+      });
 
       stream.getTracks().forEach(track => track.stop());
     } catch (e) {
       console.error('Access denied for audio/video: ', e);
     }
   }, [ isEnumDevices ]);
-
-  const enumerateDevices = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    devices.forEach((device) => {
-      if (device.kind === 'audioinput' || device.kind === 'videoinput') {
-        devicesRef.current.push({
-          type: device.kind,
-          value: device.deviceId,
-          label: device.label,
-        });
-      }
-
-      setIsEnumDevices(true);
-    });
-  }
 
   useEffect(() => {
     initEnumDevices().then();
