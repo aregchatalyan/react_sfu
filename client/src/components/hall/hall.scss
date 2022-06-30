@@ -26,13 +26,15 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  //justify-content: space-evenly;
+  justify-content: center;
 
   video {
-    width: 100%;
-    max-height: 278px;
-    //width: 33.33%;
-    //height: 50%;
-    //object-fit: fill;
+    height: auto;
+    min-width: 280px;
+    max-width: 390px;
+
+    margin: 2px;
+    border-radius: 4px;
+    border: 2px solid white;
   }
 }

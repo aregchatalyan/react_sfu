@@ -6,6 +6,12 @@ import EnumDevices from './enum-devices/EnumDevices';
 import { MediaTypes } from '../../services/constants';
 import { RoomContext } from '../../context/RoomContext';
 
+const Button = ({ active = undefined, color = undefined, icon, action }) => (
+  <button style={{ backgroundColor: active === undefined ? 'black' : active ? 'white' : 'red' }} onClick={action}>
+    <div><i style={{ color: color === undefined ? '' : 'white' }} className={`fas fa-${icon}`}/></div>
+  </button>
+);
+
 const Control = ({ setShowForm }) => {
   const audioSelRef = useRef(null);
   const videoSelRef = useRef(null);
@@ -17,7 +23,7 @@ const Control = ({ setShowForm }) => {
 
   const onExit = () => {
     setShowForm(true);
-    roomContext.exit()
+    roomContext.exit();
   }
 
   const onDevices = () => {
@@ -48,38 +54,14 @@ const Control = ({ setShowForm }) => {
 
   return (
     <div className="control">
-      <button style={{ backgroundColor: 'black' }} onClick={onExit}>
-        <div>
-          <i style={{ color: 'white' }} className="fas fa-sign-out-alt"/>
-        </div>
-      </button>
+      <Button color={'white'} icon={'sign-out-alt'} action={onExit}/>
 
-      <button style={{ backgroundColor: onOff.devices ? 'white' : 'red' }} onClick={onDevices}>
-        <div>
-          <i className="fas fa-cogs"/>
-        </div>
-      </button>
+      <Button active={onOff.devices} icon={'cogs'} action={onDevices}/>
+      <Button active={onOff.mic} icon={'microphone'} action={onMicrophone}/>
+      <Button active={onOff.cam} icon={'camera'} action={onCamera}/>
+      <Button active={onOff.desk} icon={'desktop'} action={onDesktop}/>
 
-      <button style={{ backgroundColor: onOff.mic ? 'white' : 'red' }} onClick={onMicrophone}>
-        <div>
-          <i className="fas fa-microphone"/>
-        </div>
-
-      </button>
-
-      <button style={{ backgroundColor: onOff.cam ? 'white' : 'red' }} onClick={onCamera}>
-        <div>
-          <i className="fas fa-camera"/>
-        </div>
-      </button>
-
-      <button style={{ backgroundColor: onOff.desk ? 'white' : 'red' }} onClick={onDesktop}>
-        <div>
-          <i className="fas fa-desktop"/>
-        </div>
-      </button>
-
-      <EnumDevices {...{audioSelRef, videoSelRef}} style={{ display: showDevices ? 'block' : 'none' }}/>
+      <EnumDevices {...{ audioSelRef, videoSelRef }} style={{ display: showDevices ? 'block' : 'none' }}/>
     </div>
   );
 };

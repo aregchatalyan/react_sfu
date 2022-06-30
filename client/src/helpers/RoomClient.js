@@ -435,7 +435,7 @@ export default class RoomClient {
     this.producerLabel.delete(type);
 
     if (type !== MediaTypes.audio) {
-      let elem = document.getElementById(producer_id);
+      let elem = document.getElementById(`${producer_id}`);
       elem.srcObject.getTracks().forEach(function (track) {
         track.stop();
       });
