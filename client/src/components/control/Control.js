@@ -1,16 +1,11 @@
 import React, { useContext, useRef, useState } from 'react';
 import './controll.scss';
 
+import Button from './button/Button';
 import EnumDevices from './enum-devices/EnumDevices';
 
 import { MediaTypes } from '../../services/constants';
 import { RoomContext } from '../../context/RoomContext';
-
-const Button = ({ active = undefined, color = undefined, icon, action }) => (
-  <button style={{ backgroundColor: active === undefined ? 'black' : active ? 'white' : 'red' }} onClick={action}>
-    <div><i style={{ color: color === undefined ? '' : 'white' }} className={`fas fa-${icon}`}/></div>
-  </button>
-);
 
 const Control = ({ setShowForm }) => {
   const audioSelRef = useRef(null);
@@ -54,12 +49,35 @@ const Control = ({ setShowForm }) => {
 
   return (
     <div className="control">
-      <Button color={'white'} icon={'sign-out-alt'} action={onExit}/>
+      <Button
+        // active={undefined}
+        colors={{ active: 'white', inactive: 'blue' }}
+        icon={'sign-out-alt'}
+        action={onExit}/>
 
-      <Button active={onOff.devices} icon={'cogs'} action={onDevices}/>
-      <Button active={onOff.mic} icon={'microphone'} action={onMicrophone}/>
-      <Button active={onOff.cam} icon={'camera'} action={onCamera}/>
-      <Button active={onOff.desk} icon={'desktop'} action={onDesktop}/>
+      <Button
+        active={onOff.devices}
+        colors={{ active: 'white', inactive: 'blue' }}
+        icon={'cogs'}
+        action={onDevices}/>
+
+      <Button
+        active={onOff.mic}
+        colors={{ active: 'white', inactive: 'blue' }}
+        icon={'microphone'}
+        action={onMicrophone}/>
+
+      <Button
+        active={onOff.cam}
+        colors={{ active: 'white', inactive: 'blue' }}
+        icon={'camera'}
+        action={onCamera}/>
+
+      <Button
+        active={onOff.desk}
+        colors={{ active: 'white', inactive: 'blue' }}
+        icon={'desktop'}
+        action={onDesktop}/>
 
       <EnumDevices {...{ audioSelRef, videoSelRef }} style={{ display: showDevices ? 'block' : 'none' }}/>
     </div>
