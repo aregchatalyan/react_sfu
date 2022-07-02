@@ -1,50 +1,39 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import './controll.scss';
 
 import Button from './button/Button';
 import EnumDevices from './enum-devices/EnumDevices';
 
 import { MediaTypes } from '../../services/constants';
-import { RoomContext } from '../../context/RoomContext';
+
+import { exit, produce, closeProducer } from '../../helpers/room-client';
 
 const Control = ({ setShowForm }) => {
   const audioSelRef = useRef(null);
   const videoSelRef = useRef(null);
 
-  const roomContext = useContext(RoomContext);
-
   const [ showDevices, setShowDevices ] = useState(false);
-  const [ onOff, setOnOff ] = useState({ devices: false, mic: false, cam: false, desk: false });
+  const [ onOff, setOnOff ] = useState({ mic: false, cam: false, screen: false });
 
-  const onExit = () => {
+  const onExit = async () => {
+    await exit();
     setShowForm(true);
-    roomContext.exit();
   }
 
-  const onDevices = () => {
+  const onShowDevices = () => {
     setShowDevices(!showDevices);
-    setOnOff({ ...onOff, devices: !onOff.devices });
   }
 
-  const onMicrophone = () => {
-    setOnOff({ ...onOff, mic: !onOff.mic });
-    onOff.mic
-      ? roomContext.closeProducer(MediaTypes.audio, audioSelRef.current.value)
-      : roomContext.produce(MediaTypes.audio, audioSelRef.current.value);
-  }
+  const onOffDevice = (device_name, type) => {
+    setOnOff({ ...onOff, [device_name]: !onOff[device_name] });
 
-  const onCamera = () => {
-    setOnOff({ ...onOff, cam: !onOff.cam });
-    onOff.cam
-      ? roomContext.closeProducer(MediaTypes.video, videoSelRef.current.value)
-      : roomContext.produce(MediaTypes.video, videoSelRef.current.value);
-  }
+    const device_id = (type === 'audio')
+      ? audioSelRef.current.value
+      : videoSelRef.current.value;
 
-  const onDesktop = () => {
-    setOnOff({ ...onOff, desk: !onOff.desk });
-    onOff.desk
-      ? roomContext.closeProducer(MediaTypes.screen)
-      : roomContext.produce(MediaTypes.screen);
+    !onOff[device_name]
+      ? produce(MediaTypes[type], device_id)
+      : closeProducer(MediaTypes[type], device_id);
   }
 
   return (
@@ -56,28 +45,28 @@ const Control = ({ setShowForm }) => {
         action={onExit}/>
 
       <Button
-        active={onOff.devices}
+        active={showDevices}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'cogs'}
-        action={onDevices}/>
+        action={() => onShowDevices()}/>
 
       <Button
         active={onOff.mic}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'microphone'}
-        action={onMicrophone}/>
+        action={() => onOffDevice('mic', 'audio')}/>
 
       <Button
         active={onOff.cam}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'camera'}
-        action={onCamera}/>
+        action={() => onOffDevice('cam', 'video')}/>
 
       <Button
-        active={onOff.desk}
+        active={onOff.screen}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'desktop'}
-        action={onDesktop}/>
+        action={() => onOffDevice('screen', 'screen')}/>
 
       <EnumDevices {...{ audioSelRef, videoSelRef }} style={{ display: showDevices ? 'block' : 'none' }}/>
     </div>

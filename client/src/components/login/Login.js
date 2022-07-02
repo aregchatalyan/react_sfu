@@ -1,28 +1,18 @@
 import React from 'react';
 import './login.scss';
 
-import RoomClient from '../../helpers/RoomClient';
+import { isOpen, createRoom } from '../../helpers/room-client';
 
-const Login = ({ form, setForm, setShowForm, setRoom, socket }) => {
+
+const Login = ({ form, setForm, setShowForm }) => {
   const onFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const onJoinRoom = () => {
+  const onJoinRoom = async () => {
     if (!form.room_id || !form.username) return;
 
-    let rc = null;
+    if (isOpen()) return console.log('Already connected to a room');
 
-    if (rc?.isOpen()) return console.log('Already connected to a room');
-
-    rc = new RoomClient(
-      'local-video',
-      'remote-videos',
-      'remote-audios',
-      socket,
-      form.room_id,
-      form.username
-    );
-
-    setRoom(rc);
+    await createRoom(form.room_id, form.username);
 
     setShowForm(false);
   }

@@ -116,7 +116,7 @@ module.exports = (io) => {
       await roomList.get(socket.room_id).removePeer(socket.id);
     });
 
-    socket.on('producerClosed', ({ producer_id }) => {
+    socket.on('producerClosed', (producer_id) => {
       console.log('Producer close', { username: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).username}` });
 
       roomList.get(socket.room_id).closeProducer(socket.id, producer_id);
