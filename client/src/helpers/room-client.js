@@ -23,10 +23,11 @@ const producerLabel = new Map();
 ////////// INIT /////////
 
 const loadDevice = async (routerRtpCapabilities) => {
-  let device;
-
   try {
-    device = new Device();
+    const device = new Device();
+    await device.load({ routerRtpCapabilities });
+
+    return device;
   } catch (error) {
     if (error.name === 'UnsupportedError') {
       console.error('Browser not supported');
@@ -34,9 +35,6 @@ const loadDevice = async (routerRtpCapabilities) => {
     }
     console.error(error);
   }
-
-  await device.load({ routerRtpCapabilities });
-  return device;
 }
 
 
@@ -98,9 +96,7 @@ const initTransports = async (device) => {
 
   // init consumerTransport
   {
-    const data = await soc('createWebRtcTransport', {
-      forceTcp: false
-    });
+    const data = await soc('createWebRtcTransport', { forceTcp: false });
 
     if (data.error) {
       console.error(data.error);
@@ -145,9 +141,11 @@ const join = async (username, room_id) => {
   try {
     const d = await soc('join', { username, room_id });
     console.log('Joined to room', d);
+
     const data = await soc('getRouterRtpCapabilities');
     device = await loadDevice(data);
     await initTransports(device);
+
     socket.emit('getProducers');
   } catch (e) {
     console.log('Join error:', e);
@@ -156,10 +154,9 @@ const join = async (username, room_id) => {
 
 
 const removeConsumer = (consumer_id) => {
-  let elem = document.getElementById(consumer_id);
+  const elem = document.getElementById(consumer_id);
 
   elem.srcObject.getTracks().forEach((track) => track.stop());
-
   elem.parentNode.removeChild(elem);
 
   consumers.delete(consumer_id);
@@ -193,14 +190,13 @@ export const exit = async (offline = false) => {
 
 const initSockets = () => {
   socket.on('consumerClosed', ({ consumer_id }) => {
-      console.log('Closing consumer:', consumer_id);
-      removeConsumer(consumer_id);
-    }
-  );
+    console.log('Closing consumer:', consumer_id);
+    removeConsumer(consumer_id);
+  });
 
   socket.on('newProducers', async (data) => {
     console.log('New producers', data);
-    for (let { producer_id } of data) {
+    for (const { producer_id } of data) {
       await consume(producer_id);
     }
   });
@@ -229,12 +225,11 @@ export const produce = async (type, deviceId = null) => {
   let mediaConstraints = {};
   let audio = false;
   let screen = false;
+
   switch (type) {
     case MediaTypes.audio:
       mediaConstraints = {
-        audio: {
-          deviceId: deviceId
-        },
+        audio: { deviceId: deviceId },
         video: false
       };
       audio = true;
@@ -243,14 +238,8 @@ export const produce = async (type, deviceId = null) => {
       mediaConstraints = {
         audio: false,
         video: {
-          width: {
-            min: 640,
-            ideal: 1280
-          },
-          height: {
-            min: 480,
-            ideal: 720
-          },
+          width: { min: 640, ideal: 1280 },
+          height: { min: 480, ideal: 720 },
           deviceId: deviceId,
         }
       };
@@ -358,15 +347,13 @@ export const produce = async (type, deviceId = null) => {
 const getConsumeStream = async (producerId) => {
   const { rtpCapabilities } = device;
 
-  const data = await soc('consume', {
+  const { id, kind, rtpParameters } = await soc('consume', {
     rtpCapabilities,
     consumerTransportId: consumerTransport.id, // might be
     producerId
   });
 
-  const { id, kind, rtpParameters } = data;
-
-  let codecOptions = {};
+  const codecOptions = {};
   const consumer = await consumerTransport.consume({
     id,
     producerId,
@@ -422,7 +409,7 @@ export const closeProducer = (type) => {
     return;
   }
 
-  let producer_id = producerLabel.get(type);
+  const producer_id = producerLabel.get(type);
   console.log('Close producer', producer_id);
 
   socket.emit('producerClosed', producer_id);
@@ -432,7 +419,7 @@ export const closeProducer = (type) => {
   producerLabel.delete(type);
 
   if (type !== MediaTypes.audio) {
-    let elem = document.getElementById(`${producer_id}`);
+    const elem = document.getElementById(`${producer_id}`);
     elem.srcObject.getTracks().forEach((track) => track.stop());
     elem.parentNode.removeChild(elem);
   }
@@ -447,15 +434,14 @@ export const isOpen = () => {
 //////// UTILITY ////////
 
 const handleFS = (id) => {
-  let videoPlayer = document.getElementById(id);
+  const videoPlayer = document.getElementById(id);
 
   videoPlayer.addEventListener('fullscreenchange', () => {
     if (videoPlayer.controls) return;
 
-    const fullscreenElement = document.fullscreenElement;
+    const fullscreenElement = document['fullscreenElement'];
 
     if (!fullscreenElement) {
-      videoPlayer.style.pointerEvents = 'auto';
       isVideoOnFullScreen = false;
     }
   });
@@ -466,7 +452,6 @@ const handleFS = (id) => {
     const webkitIsFullScreen = document['webkitIsFullScreen'];
 
     if (!webkitIsFullScreen) {
-      videoPlayer.style.pointerEvents = 'auto';
       isVideoOnFullScreen = false;
     }
   });
@@ -481,10 +466,11 @@ const handleFS = (id) => {
         videoPlayer['webkitRequestFullscreen']();
       } else if (videoPlayer['msRequestFullscreen']) {
         videoPlayer['msRequestFullscreen']();
+      } else if (videoPlayer['webkitEnterFullscreen']) {
+        videoPlayer['webkitEnterFullscreen']();
       }
 
       isVideoOnFullScreen = true;
-      videoPlayer.style.pointerEvents = 'none';
     } else {
       if (document.exitFullscreen) {
         await document.exitFullscreen();
@@ -494,8 +480,8 @@ const handleFS = (id) => {
         document['msExitFullscreen']();
       }
 
+      videoPlayer.play();
       isVideoOnFullScreen = false;
-      videoPlayer.style.pointerEvents = 'auto';
     }
   });
 }
