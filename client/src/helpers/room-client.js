@@ -192,6 +192,8 @@ const initSockets = () => {
   socket.on('consumerClosed', ({ consumer_id }) => {
     console.log('Closing consumer:', consumer_id);
     removeConsumer(consumer_id);
+    window.sessionStorage.setItem('layout', `${consumers.size}`)
+    socket.emit('counter')
   });
 
   socket.on('newProducers', async (data) => {
@@ -199,6 +201,8 @@ const initSockets = () => {
     for (const { producer_id } of data) {
       await consume(producer_id);
     }
+    window.sessionStorage.setItem('layout', `${consumers.size}`)
+    socket.emit('counter')
   });
 
   socket.on('disconnect', async () => {

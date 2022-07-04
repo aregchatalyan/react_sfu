@@ -141,5 +141,7 @@ module.exports = (io) => {
 
       callback('successfully exited room');
     });
+
+    socket.on('counter', () => socket.emit('layout'));
   });
 };
