@@ -1,4 +1,4 @@
-#media {
+.media {
   position: relative;
 
   video {
@@ -6,21 +6,22 @@
   }
 }
 
-#local-video {
+.local-video {
   display: flex;
   border-radius: 4px;
 
   position: absolute;
   right: 4px;
   bottom: 4px;
+  z-index: 100;
 
   video {
-    height: 160px;
+    height: 240px;
     border-radius: 4px;
   }
 }
 
-#remote-videos {
+.remote-videos {
   height: 100vh;
   display: flex;
   flex-wrap: wrap;
@@ -28,11 +29,13 @@
   justify-content: center;
 
   video {
-    height: auto;
-    min-width: 280px;
-    max-width: 390px;
+    max-width: 555px;
 
     margin: 2px;
     border-radius: 4px;
+
+    @media only screen and (max-width: 375px) {
+      max-width: 375px;
+    }
   }
 }

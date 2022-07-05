@@ -13,10 +13,10 @@ socket.on('connect_error', () => {
 });
 
 export const soc = (type, data = {}) => new Promise((resolve, reject) => {
-  // console.log('EMIT', type, data);
+  console.log('EMIT', type, data);
 
   socket.emit(type, data, (data) => {
-    // console.log('CALLBACK', type, data);
+    console.log('CALLBACK', type, data);
 
     data.error ? reject(data.error) : resolve(data);
   });

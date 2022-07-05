@@ -1,7 +1,5 @@
-import { forwardRef } from 'react';
-
-const Button = forwardRef(({ active = undefined, colors = undefined, icon, action }, ref) => (
-  <button ref={ref} style={{
+const Button = ({ active = undefined, colors = undefined, icon, action }) => (
+  <button style={{
     backgroundColor: active === undefined
       ? 'black' : active
         ? colors.active : colors.inactive
@@ -16,6 +14,6 @@ const Button = forwardRef(({ active = undefined, colors = undefined, icon, actio
          className={`fas fa-${icon}`}/>
     </div>
   </button>
-));
+);
 
 export default Button;

@@ -1,4 +1,4 @@
-import { Device } from 'mediasoup-client';
+import * as mediasoup from 'mediasoup-client';
 
 import { MediaTypes } from '../services/constants';
 import { soc, socket } from '../services/socket-init';
@@ -19,7 +19,7 @@ const producerLabel = new Map();
 
 const loadDevice = async (routerRtpCapabilities) => {
   try {
-    const device = new Device();
+    const device = new mediasoup.Device();
     await device.load({ routerRtpCapabilities });
 
     return device;
@@ -190,8 +190,6 @@ const initSockets = (media, setMedia) => {
   socket.on('consumerClosed', ({ consumer_id }) => {
     console.log('Closing consumer:', consumer_id);
     removeConsumer(consumer_id, media, setMedia);
-    window.sessionStorage.setItem('layout', `${consumers.size}`)
-    socket.emit('counter')
   });
 
   socket.on('newProducers', async (data) => {
@@ -199,8 +197,6 @@ const initSockets = (media, setMedia) => {
     for (const { producer_id } of data) {
       await consume(producer_id, media, setMedia);
     }
-    window.sessionStorage.setItem('layout', `${consumers.size}`)
-    socket.emit('counter')
   });
 
   socket.on('disconnect', async () => {
@@ -306,7 +302,7 @@ export const produce = async (type, deviceId = null, media, setMedia) => {
     }
 
     producer.on('trackended', () => {
-      closeProducer(type);
+      closeProducer(type, media, setMedia);
     });
 
     producer.on('transportclose', () => {
@@ -379,7 +375,7 @@ export const consume = async (producer_id, media, setMedia) => {
 }
 
 
-export const closeProducer = (type, _, media, setMedia) => {
+export const closeProducer = (type, media, setMedia) => {
   if (!producerLabel.has(type)) {
     console.log('There is no producer for this type ' + type);
     return;
