@@ -1,14 +1,9 @@
 import { Device } from 'mediasoup-client';
 
 import { MediaTypes } from '../services/constants';
-import { socket, soc } from '../services/socket-init';
-
-const localMediaEl = 'local-video';
-const remoteVideoEl = 'remote-videos';
-const remoteAudioEl = 'remote-audios';
+import { soc, socket } from '../services/socket-init';
 
 let _isOpen = false;
-let isVideoOnFullScreen = false;
 
 let producer;
 let device = null;
@@ -153,11 +148,14 @@ const join = async (username, room_id) => {
 }
 
 
-const removeConsumer = (consumer_id) => {
-  const elem = document.getElementById(consumer_id);
+const removeConsumer = (consumer_id, media, setMedia) => {
+  media.remote.forEach(item => {
+    if (item.id === consumer_id) {
+      item.getTracks().forEach((track) => track.stop());
+    }
+  });
 
-  elem.srcObject.getTracks().forEach((track) => track.stop());
-  elem.parentNode.removeChild(elem);
+  setMedia(prev => ({ ...prev, remote: [ ...prev.remote.filter(item => item.id !== consumer_id) ] }));
 
   consumers.delete(consumer_id);
 }
@@ -188,10 +186,10 @@ export const exit = async (offline = false) => {
 }
 
 
-const initSockets = () => {
+const initSockets = (media, setMedia) => {
   socket.on('consumerClosed', ({ consumer_id }) => {
     console.log('Closing consumer:', consumer_id);
-    removeConsumer(consumer_id);
+    removeConsumer(consumer_id, media, setMedia);
     window.sessionStorage.setItem('layout', `${consumers.size}`)
     socket.emit('counter')
   });
@@ -199,7 +197,7 @@ const initSockets = () => {
   socket.on('newProducers', async (data) => {
     console.log('New producers', data);
     for (const { producer_id } of data) {
-      await consume(producer_id);
+      await consume(producer_id, media, setMedia);
     }
     window.sessionStorage.setItem('layout', `${consumers.size}`)
     socket.emit('counter')
@@ -211,11 +209,11 @@ const initSockets = () => {
 }
 
 
-export const createRoom = async (room_id, username) => {
+export const createRoom = async (room_id, username, media, setMedia) => {
   try {
     await soc('createRoom', { room_id });
     await join(username, room_id);
-    initSockets();
+    initSockets(media, setMedia);
     _isOpen = true;
   } catch (e) {
     console.log('Create room error:', e);
@@ -225,7 +223,7 @@ export const createRoom = async (room_id, username) => {
 
 //////// MAIN FUNCTIONS /////////////
 
-export const produce = async (type, deviceId = null) => {
+export const produce = async (type, deviceId = null, media, setMedia) => {
   let mediaConstraints = {};
   let audio = false;
   let screen = false;
@@ -303,16 +301,8 @@ export const produce = async (type, deviceId = null) => {
 
     producers.set(producer.id, producer);
 
-    let elem;
     if (!audio) {
-      elem = document.createElement('video');
-      elem.srcObject = stream;
-      elem.id = producer.id;
-      elem.setAttribute('playsinline', 'true');
-      elem.setAttribute('autoplay', 'true');
-      elem.setAttribute('muted', 'true');
-      document.getElementById(localMediaEl).appendChild(elem);
-      handleFS(elem.id);
+      setMedia(prev => ({ ...prev, local: { ...prev.local, id: producer.id, video: stream } }));
     }
 
     producer.on('trackended', () => {
@@ -322,10 +312,8 @@ export const produce = async (type, deviceId = null) => {
     producer.on('transportclose', () => {
       console.log('Producer transport close');
       if (!audio) {
-        elem.srcObject.getTracks().forEach((track) => {
-          track.stop();
-        });
-        elem.parentNode.removeChild(elem);
+        media.local.video.getTracks().forEach((track) => track.stop());
+        setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
       }
       producers.delete(producer.id);
     });
@@ -333,10 +321,8 @@ export const produce = async (type, deviceId = null) => {
     producer.on('close', () => {
       console.log('Closing producer');
       if (!audio) {
-        elem.srcObject.getTracks().forEach((track) => {
-          track.stop();
-        });
-        elem.parentNode.removeChild(elem);
+        media.local.video.getTracks().forEach((track) => track.stop());
+        setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
       }
       producers.delete(producer.id);
     });
@@ -377,28 +363,14 @@ const getConsumeStream = async (producerId) => {
 }
 
 
-export const consume = async (producer_id) => {
+export const consume = async (producer_id, media, setMedia) => {
   const { consumer, stream, kind } = await getConsumeStream(producer_id)
   consumers.set(consumer.id, consumer);
 
-  let elem;
   if (kind === 'video') {
-    elem = document.createElement('video');
-    elem.srcObject = stream;
-    elem.id = consumer.id;
-    elem.setAttribute('playsinline', 'true');
-    elem.setAttribute('autoplay', 'true');
-    elem.setAttribute('muted', 'true');
-    elem.className = 'vid';
-    document.getElementById(remoteVideoEl).appendChild(elem);
-    handleFS(elem.id);
+    setMedia(prev => ({ ...prev, remote: [ ...prev.remote, { id: consumer.id, video: stream } ] }));
   } else {
-    elem = document.createElement('audio');
-    elem.srcObject = stream;
-    elem.id = consumer.id;
-    elem.playsinline = false;
-    elem.autoplay = true;
-    document.getElementById(remoteAudioEl).appendChild(elem);
+    setMedia(prev => ({ ...prev, remote: [ ...prev.remote, { id: consumer.id, audio: stream } ] }));
   }
 
   consumer.on('trackended', () => removeConsumer(consumer.id));
@@ -407,7 +379,7 @@ export const consume = async (producer_id) => {
 }
 
 
-export const closeProducer = (type) => {
+export const closeProducer = (type, _, media, setMedia) => {
   if (!producerLabel.has(type)) {
     console.log('There is no producer for this type ' + type);
     return;
@@ -423,9 +395,8 @@ export const closeProducer = (type) => {
   producerLabel.delete(type);
 
   if (type !== MediaTypes.audio) {
-    const elem = document.getElementById(`${producer_id}`);
-    elem.srcObject.getTracks().forEach((track) => track.stop());
-    elem.parentNode.removeChild(elem);
+    media.local.video.getTracks().forEach((track) => track.stop());
+    setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
   }
 }
 
@@ -433,60 +404,3 @@ export const closeProducer = (type) => {
 export const isOpen = () => {
   return _isOpen;
 }
-
-
-//////// UTILITY ////////
-
-const handleFS = (id) => {
-  const videoPlayer = document.getElementById(id);
-
-  videoPlayer.addEventListener('fullscreenchange', () => {
-    if (videoPlayer.controls) return;
-
-    const fullscreenElement = document['fullscreenElement'];
-
-    if (!fullscreenElement) {
-      isVideoOnFullScreen = false;
-    }
-  });
-
-  videoPlayer.addEventListener('webkitfullscreenchange', () => {
-    if (videoPlayer.controls) return;
-
-    const webkitIsFullScreen = document['webkitIsFullScreen'];
-
-    if (!webkitIsFullScreen) {
-      isVideoOnFullScreen = false;
-    }
-  });
-
-  videoPlayer.addEventListener('click', async () => {
-    if (videoPlayer.controls) return;
-
-    if (!isVideoOnFullScreen) {
-      if (videoPlayer.requestFullscreen) {
-        await videoPlayer.requestFullscreen();
-      } else if (videoPlayer['webkitRequestFullscreen']) {
-        videoPlayer['webkitRequestFullscreen']();
-      } else if (videoPlayer['msRequestFullscreen']) {
-        videoPlayer['msRequestFullscreen']();
-      } else if (videoPlayer['webkitEnterFullscreen']) {
-        videoPlayer['webkitEnterFullscreen']();
-      }
-
-      isVideoOnFullScreen = true;
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if (document['webkitCancelFullScreen']) {
-        document['webkitCancelFullScreen']();
-      } else if (document['msExitFullscreen']) {
-        document['msExitFullscreen']();
-      }
-
-      videoPlayer.play();
-      isVideoOnFullScreen = false;
-    }
-  });
-}
-

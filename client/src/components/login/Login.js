@@ -3,8 +3,7 @@ import './login.scss';
 
 import { isOpen, createRoom } from '../../helpers/room-client';
 
-
-const Login = ({ form, setForm, setShowForm }) => {
+const Login = ({ form, setForm, setShowForm, media, setMedia }) => {
   const onFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onJoinRoom = async () => {
@@ -12,7 +11,7 @@ const Login = ({ form, setForm, setShowForm }) => {
 
     if (isOpen()) return console.log('Already connected to a room');
 
-    await createRoom(form.room_id, form.username);
+    await createRoom(form.room_id, form.username, media, setMedia);
 
     setShowForm(false);
   }
