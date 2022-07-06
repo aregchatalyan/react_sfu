@@ -6,12 +6,12 @@ import { onFullScreen } from '../../helpers/full-screen';
 const Hall = ({ media: { local, remote } }) => (
   <div className="media">
     <div className="local-video">
-      {local.video && <video id={local.id} key={local.id} ref={(ref) => {
-        if (ref) {
-          ref.srcObject = local.video;
-          ref.onclick = async () => await onFullScreen(ref);
-        }
-      }} autoPlay={true} muted={true} playsInline={true}/>}
+        {local.map((item) => (<video id={item.id} key={item.id} ref={(ref) => {
+            if (ref) {
+                ref.srcObject = item.video;
+                ref.onclick = async () => await onFullScreen(ref);
+            }
+        }} autoPlay={true} muted={true} playsInline={true}/>))}
     </div>
 
     <div className="remote-videos">

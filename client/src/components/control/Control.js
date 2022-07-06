@@ -6,9 +6,9 @@ import EnumDevices from './enum-devices/EnumDevices';
 
 import { MediaTypes } from '../../services/constants';
 
-import { exit, produce, closeProducer } from '../../helpers/room-client';
+import { closeProducer, exit, produce } from '../../helpers/room-client';
 
-const Control = ({ setShowForm, media, setMedia }) => {
+const Control = ({ setForm, setMedia }) => {
   const audioSelRef = useRef(null);
   const videoSelRef = useRef(null);
 
@@ -17,7 +17,7 @@ const Control = ({ setShowForm, media, setMedia }) => {
 
   const onExit = async () => {
     await exit();
-    setShowForm(true);
+    setForm(prev => ({ ...prev, show: true }));
   }
 
   const onShowDevices = () => {
@@ -32,14 +32,13 @@ const Control = ({ setShowForm, media, setMedia }) => {
       : videoSelRef.current.value;
 
     !onOff[device_name]
-      ? produce(MediaTypes[type], device_id, media, setMedia)
-      : closeProducer(MediaTypes[type], media, setMedia);
+      ? produce(MediaTypes[type], device_id, setMedia)
+      : closeProducer(MediaTypes[type], setMedia);
   }
 
   return (
     <div className="control">
       <Button
-        // active={undefined}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'sign-out-alt'}
         action={onExit}/>
@@ -48,7 +47,7 @@ const Control = ({ setShowForm, media, setMedia }) => {
         active={showDevices}
         colors={{ active: 'white', inactive: 'blue' }}
         icon={'cogs'}
-        action={() => onShowDevices()}/>
+        action={onShowDevices}/>
 
       <Button
         active={onOff.mic}

@@ -5,7 +5,7 @@ import { API_URL } from './config';
 export const socket = io(API_URL, {
   secure: true,
   transports: [ 'websocket', 'polling' ]
-})
+});
 
 socket.on('connect_error', () => {
   socket.io.opts.transports = [ 'polling', 'websocket' ]

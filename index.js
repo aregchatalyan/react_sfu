@@ -15,18 +15,18 @@ const socket = require('./services/socket');
 if (process.env.NODE_ENV === 'production') {
   protocol = 'http';
   httpServer = http.createServer(app);
-} else {
-  protocol = 'https';
-  httpServer = https.createServer({
-    key: config.sslKey,
-    cert: config.sslCrt
-  }, app);
 
   app.use(express.static(path.join(__dirname, 'client', 'build')));
 
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
   });
+} else {
+  protocol = 'https';
+  httpServer = https.createServer({
+    key: config.sslKey,
+    cert: config.sslCrt
+  }, app);
 }
 
 httpServer.listen(config.listenPort, () => {

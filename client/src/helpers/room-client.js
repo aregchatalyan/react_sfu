@@ -148,14 +148,15 @@ const join = async (username, room_id) => {
 }
 
 
-const removeConsumer = (consumer_id, media, setMedia) => {
-  media.remote.forEach(item => {
-    if (item.id === consumer_id) {
-      item.getTracks().forEach((track) => track.stop());
-    }
+const removeConsumer = (consumer_id, setMedia) => {
+  setMedia(prev => {
+    prev.remote.forEach(item => {
+      if (item.id === consumer_id) {
+        item.video.getTracks().forEach((track) => track.stop());
+      }
+    });
+    return { ...prev, remote: [ ...prev.remote.filter(item => item.id !== consumer_id) ] }
   });
-
-  setMedia(prev => ({ ...prev, remote: [ ...prev.remote.filter(item => item.id !== consumer_id) ] }));
 
   consumers.delete(consumer_id);
 }
@@ -186,16 +187,16 @@ export const exit = async (offline = false) => {
 }
 
 
-const initSockets = (media, setMedia) => {
+const initSockets = (setMedia) => {
   socket.on('consumerClosed', ({ consumer_id }) => {
     console.log('Closing consumer:', consumer_id);
-    removeConsumer(consumer_id, media, setMedia);
+    removeConsumer(consumer_id, setMedia);
   });
 
   socket.on('newProducers', async (data) => {
     console.log('New producers', data);
     for (const { producer_id } of data) {
-      await consume(producer_id, media, setMedia);
+      await consume(producer_id, setMedia);
     }
   });
 
@@ -205,11 +206,11 @@ const initSockets = (media, setMedia) => {
 }
 
 
-export const createRoom = async (room_id, username, media, setMedia) => {
+export const createRoom = async (room_id, username, setMedia) => {
   try {
     await soc('createRoom', { room_id });
     await join(username, room_id);
-    initSockets(media, setMedia);
+    initSockets(setMedia);
     _isOpen = true;
   } catch (e) {
     console.log('Create room error:', e);
@@ -219,7 +220,7 @@ export const createRoom = async (room_id, username, media, setMedia) => {
 
 //////// MAIN FUNCTIONS /////////////
 
-export const produce = async (type, deviceId = null, media, setMedia) => {
+export const produce = async (type, deviceId = null, setMedia) => {
   let mediaConstraints = {};
   let audio = false;
   let screen = false;
@@ -298,29 +299,25 @@ export const produce = async (type, deviceId = null, media, setMedia) => {
     producers.set(producer.id, producer);
 
     if (!audio) {
-      setMedia(prev => ({ ...prev, local: { ...prev.local, id: producer.id, video: stream } }));
+      setMedia(prev => ({ ...prev, local: [ ...prev.local, { id: producer.id, video: stream } ] }));
     }
 
     producer.on('trackended', () => {
-      closeProducer(type, media, setMedia);
+      closeProducer(type, setMedia);
     });
 
     producer.on('transportclose', () => {
       console.log('Producer transport close');
       if (!audio) {
-        media.local.video.getTracks().forEach((track) => track.stop());
-        setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
+        closeProducer(type, setMedia);
       }
-      producers.delete(producer.id);
     });
 
     producer.on('close', () => {
       console.log('Closing producer');
       if (!audio) {
-        media.local.video.getTracks().forEach((track) => track.stop());
-        setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
+        closeProducer(type, setMedia);
       }
-      producers.delete(producer.id);
     });
 
     producerLabel.set(type, producer.id);
@@ -359,7 +356,7 @@ const getConsumeStream = async (producerId) => {
 }
 
 
-export const consume = async (producer_id, media, setMedia) => {
+export const consume = async (producer_id, setMedia) => {
   const { consumer, stream, kind } = await getConsumeStream(producer_id)
   consumers.set(consumer.id, consumer);
 
@@ -375,7 +372,7 @@ export const consume = async (producer_id, media, setMedia) => {
 }
 
 
-export const closeProducer = (type, media, setMedia) => {
+export const closeProducer = (type, setMedia) => {
   if (!producerLabel.has(type)) {
     console.log('There is no producer for this type ' + type);
     return;
@@ -391,8 +388,14 @@ export const closeProducer = (type, media, setMedia) => {
   producerLabel.delete(type);
 
   if (type !== MediaTypes.audio) {
-    media.local.video.getTracks().forEach((track) => track.stop());
-    setMedia(prev => ({ ...prev, local: { id: null, video: null, } }));
+    setMedia(prev => {
+      prev.local.forEach(item => {
+        if (item.id === producer_id) {
+          item.video.getTracks().forEach((track) => track.stop());
+        }
+      });
+      return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer_id) ] }
+    });
   }
 }
 

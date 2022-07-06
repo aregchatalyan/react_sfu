@@ -1,19 +1,18 @@
 import React from 'react';
 import './login.scss';
 
-import { isOpen, createRoom } from '../../helpers/room-client';
+import { createRoom, isOpen } from '../../helpers/room-client';
 
-const Login = ({ form, setForm, setShowForm, media, setMedia }) => {
+const Login = ({ form, setForm, setMedia }) => {
   const onFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onJoinRoom = async () => {
     if (!form.room_id || !form.username) return;
-
     if (isOpen()) return console.log('Already connected to a room');
 
-    await createRoom(form.room_id, form.username, media, setMedia);
+    await createRoom(form.room_id, form.username, setMedia);
 
-    setShowForm(false);
+    setForm({ ...form, show: false });
   }
 
   return (
@@ -38,9 +37,7 @@ const Login = ({ form, setForm, setShowForm, media, setMedia }) => {
           onChange={onFormChange}/>
 
         <button onClick={onJoinRoom}>
-          <div>
-            <i className="fas fa-sign-in-alt"/>
-          </div>
+          <div><i className="fas fa-sign-in-alt"/></div>
         </button>
       </div>
     </div>
