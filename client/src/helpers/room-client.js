@@ -309,15 +309,33 @@ export const produce = async (type, deviceId = null, setMedia) => {
     producer.on('transportclose', () => {
       console.log('Producer transport close');
       if (!audio) {
-        closeProducer(type, setMedia);
+        setMedia(prev => {
+          prev.local.forEach(item => {
+            if (item.id === producer.id) {
+              item.video.getTracks().forEach((track) => track.stop());
+            }
+          });
+          return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer.id) ] }
+        });
       }
+      producerLabel.delete(type);
+      producers.delete(producer.id);
     });
 
     producer.on('close', () => {
       console.log('Closing producer');
       if (!audio) {
-        closeProducer(type, setMedia);
+        setMedia(prev => {
+          prev.local.forEach(item => {
+            if (item.id === producer.id) {
+              item.video.getTracks().forEach((track) => track.stop());
+            }
+          });
+          return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer.id) ] }
+        });
       }
+      producerLabel.delete(type);
+      producers.delete(producer.id);
     });
 
     producerLabel.set(type, producer.id);
