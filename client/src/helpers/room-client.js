@@ -14,9 +14,7 @@ const consumers = new Map();
 const producers = new Map();
 const producerLabel = new Map();
 
-
 ////////// INIT /////////
-
 const loadDevice = async (routerRtpCapabilities) => {
   try {
     const device = new mediasoup.Device();
@@ -31,7 +29,6 @@ const loadDevice = async (routerRtpCapabilities) => {
     console.error(error);
   }
 }
-
 
 const initTransports = async (device) => {
   // init producerTransport
@@ -88,7 +85,6 @@ const initTransports = async (device) => {
       }
     });
   }
-
   // init consumerTransport
   {
     const data = await soc('createWebRtcTransport', { forceTcp: false });
@@ -131,7 +127,6 @@ const initTransports = async (device) => {
   }
 }
 
-
 const join = async (username, room_id) => {
   try {
     const d = await soc('join', { username, room_id });
@@ -147,20 +142,21 @@ const join = async (username, room_id) => {
   }
 }
 
-
 const removeConsumer = (consumer_id, setMedia) => {
   setMedia(prev => {
     prev.remote.forEach(item => {
-      if (item.id === consumer_id) {
+      if (item.id === consumer_id)
         item.video.getTracks().forEach((track) => track.stop());
-      }
     });
-    return { ...prev, remote: [ ...prev.remote.filter(item => item.id !== consumer_id) ] }
+
+    return {
+      ...prev,
+      remote: [ ...prev.remote.filter(item => item.id !== consumer_id) ]
+    }
   });
 
   consumers.delete(consumer_id);
 }
-
 
 export const exit = async (offline = false) => {
   const clean = () => {
@@ -186,7 +182,6 @@ export const exit = async (offline = false) => {
   }
 }
 
-
 const initSockets = (setMedia) => {
   socket.on('consumerClosed', ({ consumer_id }) => {
     console.log('Closing consumer:', consumer_id);
@@ -205,7 +200,6 @@ const initSockets = (setMedia) => {
   });
 }
 
-
 export const createRoom = async (room_id, username, setMedia) => {
   try {
     await soc('createRoom', { room_id });
@@ -217,9 +211,7 @@ export const createRoom = async (room_id, username, setMedia) => {
   }
 }
 
-
 //////// MAIN FUNCTIONS /////////////
-
 export const produce = async (type, deviceId = null, setMedia) => {
   let mediaConstraints = {};
   let audio = false;
@@ -299,51 +291,50 @@ export const produce = async (type, deviceId = null, setMedia) => {
     producers.set(producer.id, producer);
 
     if (!audio) {
-      setMedia(prev => ({ ...prev, local: [ ...prev.local, { id: producer.id, video: stream } ] }));
+      setMedia(prev => ({
+        ...prev,
+        local: [ ...prev.local, { id: producer.id, video: stream } ]
+      }));
     }
 
     producer.on('trackended', () => {
       closeProducer(type, setMedia);
     });
 
-    producer.on('transportclose', () => {
-      console.log('Producer transport close');
+    const close = () => {
       if (!audio) {
         setMedia(prev => {
           prev.local.forEach(item => {
-            if (item.id === producer.id) {
+            if (item.id === producer.id)
               item.video.getTracks().forEach((track) => track.stop());
-            }
           });
-          return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer.id) ] }
+
+          return {
+            ...prev,
+            local: [ ...prev.local.filter(item => item.id !== producer.id) ]
+          }
         });
       }
       producerLabel.delete(type);
       producers.delete(producer.id);
+    }
+
+    producer.on('transportclose', () => {
+      console.log('Producer transport close');
+      close();
     });
 
     producer.on('close', () => {
       console.log('Closing producer');
-      if (!audio) {
-        setMedia(prev => {
-          prev.local.forEach(item => {
-            if (item.id === producer.id) {
-              item.video.getTracks().forEach((track) => track.stop());
-            }
-          });
-          return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer.id) ] }
-        });
-      }
-      producerLabel.delete(type);
-      producers.delete(producer.id);
+      close();
     });
 
     producerLabel.set(type, producer.id);
-  } catch (err) {
+  } catch
+    (err) {
     console.log('Produce error:', err);
   }
 }
-
 
 const getConsumeStream = async (producerId) => {
   const { rtpCapabilities } = device;
@@ -373,22 +364,25 @@ const getConsumeStream = async (producerId) => {
   };
 }
 
-
 export const consume = async (producer_id, setMedia) => {
   const { consumer, stream, kind } = await getConsumeStream(producer_id)
   consumers.set(consumer.id, consumer);
 
   if (kind === 'video') {
-    setMedia(prev => ({ ...prev, remote: [ ...prev.remote, { id: consumer.id, video: stream } ] }));
+    setMedia(prev => ({
+      ...prev,
+      remote: [ ...prev.remote, { id: consumer.id, video: stream } ]
+    }));
   } else {
-    setMedia(prev => ({ ...prev, remote: [ ...prev.remote, { id: consumer.id, audio: stream } ] }));
+    setMedia(prev => ({
+      ...prev,
+      remote: [ ...prev.remote, { id: consumer.id, audio: stream } ]
+    }));
   }
 
   consumer.on('trackended', () => removeConsumer(consumer.id));
-
   consumer.on('transportclose', () => removeConsumer(consumer.id));
 }
-
 
 export const closeProducer = (type, setMedia) => {
   if (!producerLabel.has(type)) {
@@ -408,15 +402,17 @@ export const closeProducer = (type, setMedia) => {
   if (type !== MediaTypes.audio) {
     setMedia(prev => {
       prev.local.forEach(item => {
-        if (item.id === producer_id) {
+        if (item.id === producer_id)
           item.video.getTracks().forEach((track) => track.stop());
-        }
       });
-      return { ...prev, local: [ ...prev.local.filter(item => item.id !== producer_id) ] }
+
+      return {
+        ...prev,
+        local: [ ...prev.local.filter(item => item.id !== producer_id) ]
+      }
     });
   }
 }
-
 
 export const isOpen = () => {
   return _isOpen;

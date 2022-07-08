@@ -19,6 +19,15 @@
     height: 240px;
     border-radius: 4px;
   }
+
+  @media only screen and (max-width: 375px) {
+    & {
+      position: fixed;
+      right: 4px;
+      top: 390px;
+      z-index: 100;
+    }
+  }
 }
 
 .remote-videos {
@@ -27,15 +36,26 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
 
   video {
-    max-width: 555px;
+    max-width: calc(100% / 4);
+    max-height: calc(100% / 3 - 4px);
+    object-fit: cover;
 
     margin: 2px;
     border-radius: 4px;
+  }
 
-    @media only screen and (max-width: 375px) {
+  @media only screen and (max-width: 375px) {
+    video {
       max-width: 375px;
     }
+
+    overflow-y: auto;
   }
 }

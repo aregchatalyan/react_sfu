@@ -12,11 +12,11 @@ const app = express();
 const config = require('./config');
 const socket = require('./services/socket');
 
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
 if (process.env.NODE_ENV === 'production') {
   protocol = 'http';
   httpServer = http.createServer(app);
-
-  app.use(express.static(path.join(__dirname, 'client', 'build')));
 
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
@@ -27,6 +27,10 @@ if (process.env.NODE_ENV === 'production') {
     key: config.sslKey,
     cert: config.sslCrt
   }, app);
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  });
 }
 
 httpServer.listen(config.listenPort, () => {
