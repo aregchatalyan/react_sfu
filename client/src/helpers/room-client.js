@@ -144,7 +144,7 @@ const join = async (username, room_id) => {
 
 const removeConsumer = (consumer_id, setMedia) => {
   setMedia(prev => {
-    prev.remote.forEach(item => {
+    prev.remote.forEach((item) => {
       if (item.id === consumer_id) {
         const track = item.audio || item.video;
         track.getTracks().forEach((track) => track.stop());
@@ -306,7 +306,7 @@ export const produce = async (type, deviceId = null, setMedia) => {
     const close = () => {
       if (!audio) {
         setMedia(prev => {
-          prev.local.forEach(item => {
+          prev.local.forEach((item) => {
             if (item.id === producer.id)
               item.video.getTracks().forEach((track) => track.stop());
           });
@@ -403,7 +403,7 @@ export const closeProducer = (type, setMedia) => {
 
   if (type !== MediaTypes.audio) {
     setMedia(prev => {
-      prev.local.forEach(item => {
+      prev.local.forEach((item) => {
         if (item.id === producer_id)
           item.video.getTracks().forEach((track) => track.stop());
       });
