@@ -21,22 +21,22 @@ const Login = ({ form, setForm, setMedia }) => {
         <input
           type="text"
           name="room_id"
-          value={form.room_id}
+          value={ form.room_id }
           className="room-input"
           autoComplete="off"
           placeholder="Room"
-          onChange={onFormChange}/>
+          onChange={ onFormChange }/>
 
         <input
           type="text"
           name="username"
-          value={form.username}
+          value={ form.username }
           className="user-input"
           autoComplete="off"
           placeholder="User"
-          onChange={onFormChange}/>
+          onChange={ onFormChange }/>
 
-        <button onClick={onJoinRoom}>
+        <button onClick={ onJoinRoom }>
           <div><i className="fas fa-sign-in-alt"/></div>
         </button>
       </div>

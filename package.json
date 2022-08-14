@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "ssl": "node services/ssl-create.js"
+    "ssl": "node services/ssl.js"
   },
   "author": "",
   "license": "ISC",

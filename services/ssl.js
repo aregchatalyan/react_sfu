@@ -42,7 +42,7 @@ const paths = [
         if (!exist) await fs.promises.unlink(cert_file);
       });
 
-      await exec(`mkcert -key-file ${key_file} -cert-file ${cert_file} 0.0.0.0 localhost ${getLocalIp()}`);
+      await exec(`mkcert -key-file ${ key_file } -cert-file ${ cert_file } 0.0.0.0 localhost ${ getLocalIp() }`);
     }
 
     console.log('SSL certs created');

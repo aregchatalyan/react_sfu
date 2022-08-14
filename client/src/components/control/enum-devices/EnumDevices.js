@@ -39,16 +39,16 @@ const EnumDevices = ({ audioSelRef, videoSelRef, style }) => {
   }, [ initEnumDevices ]);
 
   return (
-    <div className="enum-devices" style={style}>
+    <div className="enum-devices" style={ style }>
       <div>
         <div className="icon">
           <i className="fas fa-microphone"/>
         </div>
 
-        <select id="audioSelect" ref={audioSelRef} className="form-select">
-          {devicesRef.current.map(({ type, value, label }) => (
-            type === 'audioinput' && <option key={label} value={value}>{label}</option>
-          ))}
+        <select id="audioSelect" ref={ audioSelRef } className="form-select">
+          { devicesRef.current.map(({ type, value, label }) => (
+            type === 'audioinput' && <option key={ label } value={ value }>{ label }</option>
+          )) }
         </select>
       </div>
 
@@ -57,10 +57,10 @@ const EnumDevices = ({ audioSelRef, videoSelRef, style }) => {
           <i className="fas fa-camera"/>
         </div>
 
-        <select id="videoSelect" ref={videoSelRef} className="form-select">
-          {devicesRef.current.map(({ type, value, label }) => (
-            type === 'videoinput' && <option key={label} value={value}>{label}</option>
-          ))}
+        <select id="videoSelect" ref={ videoSelRef } className="form-select">
+          { devicesRef.current.map(({ type, value, label }) => (
+            type === 'videoinput' && <option key={ label } value={ value }>{ label }</option>
+          )) }
         </select>
       </div>
     </div>

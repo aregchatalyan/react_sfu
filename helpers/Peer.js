@@ -26,7 +26,7 @@ module.exports = class Peer {
     this.producers.set(producer.id, producer);
 
     producer.on('transportclose', function () {
-        console.log('Producer transport close', { username: `${this.username}`, consumer_id: `${producer.id}` });
+        console.log('Producer transport close', { username: `${ this.username }`, consumer_id: `${ producer.id }` });
         producer.close();
         this.producers.delete(producer.id);
       }.bind(this)
@@ -62,7 +62,7 @@ module.exports = class Peer {
 
     consumer.on('transportclose',
       function () {
-        console.log('Consumer transport close', { username: `${this.username}`, consumer_id: `${consumer.id}` });
+        console.log('Consumer transport close', { username: `${ this.username }`, consumer_id: `${ consumer.id }` });
         this.consumers.delete(consumer.id);
       }.bind(this)
     );
@@ -91,7 +91,7 @@ module.exports = class Peer {
   }
 
   getProducer(producer_id) {
-      return this.producers.get(producer_id)
+    return this.producers.get(producer_id)
   }
 
   close() {

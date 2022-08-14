@@ -11,19 +11,19 @@ const App = () => {
   });
   const [ form, setForm ] = useState({
     room_id: '1',
-    username: `user${Math.floor(Math.random() * 101)}`,
+    username: `user${ Math.floor(Math.random() * 101) }`,
     show: true
   });
 
   return (
     <div>
-      {form.show
-        ? (<Login {...{ form, setForm, setMedia }}/>)
+      { form.show
+        ? (<Login { ...{ form, setForm, setMedia } }/>)
         : (<>
-            <Control {...{ setForm, setMedia }}/>
-            <Hall {...{ media }}/>
+            <Control { ...{ setForm, setMedia } }/>
+            <Hall { ...{ media } }/>
           </>
-        )}
+        ) }
     </div>
   );
 }

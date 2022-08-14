@@ -34,11 +34,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 httpServer.listen(config.listenPort, () => {
-  console.log(`Open ${protocol}://${config.listenIp}:${config.listenPort}`);
+  console.log(`Open ${ protocol }://${ config.listenIp }:${ config.listenPort }`);
 });
 
 socket(new Server(httpServer, { cors: { origin: '*' } }));
 
 process.on('uncaughtException', err => {
-  console.error(`Caught exception: ${err}`);
+  console.error(`Caught exception: ${ err }`);
 });

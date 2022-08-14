@@ -39,35 +39,35 @@ const Control = ({ setForm, setMedia }) => {
   return (
     <div className="control">
       <Button
-        colors={{ active: 'white', inactive: 'blue' }}
-        icon={'sign-out-alt'}
-        action={onExit}/>
+        colors={ { active: 'white', inactive: 'blue' } }
+        icon={ 'sign-out-alt' }
+        action={ onExit }/>
 
       <Button
-        active={showDevices}
-        colors={{ active: 'white', inactive: 'blue' }}
-        icon={'cogs'}
-        action={onShowDevices}/>
+        active={ showDevices }
+        colors={ { active: 'white', inactive: 'blue' } }
+        icon={ 'cogs' }
+        action={ onShowDevices }/>
 
       <Button
-        active={onOff.mic}
-        colors={{ active: 'white', inactive: 'blue' }}
-        icon={'microphone'}
-        action={() => onOffDevice('mic', 'audio')}/>
+        active={ onOff.mic }
+        colors={ { active: 'white', inactive: 'blue' } }
+        icon={ 'microphone' }
+        action={ () => onOffDevice('mic', 'audio') }/>
 
       <Button
-        active={onOff.cam}
-        colors={{ active: 'white', inactive: 'blue' }}
-        icon={'camera'}
-        action={() => onOffDevice('cam', 'video')}/>
+        active={ onOff.cam }
+        colors={ { active: 'white', inactive: 'blue' } }
+        icon={ 'camera' }
+        action={ () => onOffDevice('cam', 'video') }/>
 
       <Button
-        active={onOff.screen}
-        colors={{ active: 'white', inactive: 'blue' }}
-        icon={'desktop'}
-        action={() => onOffDevice('screen', 'screen')}/>
+        active={ onOff.screen }
+        colors={ { active: 'white', inactive: 'blue' } }
+        icon={ 'desktop' }
+        action={ () => onOffDevice('screen', 'screen') }/>
 
-      <EnumDevices {...{ audioSelRef, videoSelRef }} style={{ display: showDevices ? 'block' : 'none' }}/>
+      <EnumDevices { ...{ audioSelRef, videoSelRef } } style={ { display: showDevices ? 'block' : 'none' } }/>
     </div>
   );
 };

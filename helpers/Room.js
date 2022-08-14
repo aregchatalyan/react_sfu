@@ -115,8 +115,8 @@ module.exports = class Room {
 
     consumer.on('producerclose', function () {
         console.log('Consumer closed due to producerclose event', {
-          username: `${this.peers.get(socket_id).username}`,
-          consumer_id: `${consumer.id}`
+          username: `${ this.peers.get(socket_id).username }`,
+          consumer_id: `${ consumer.id }`
         });
 
         this.peers.get(socket_id).removeConsumer(consumer.id);

@@ -1,17 +1,17 @@
 const Button = ({ active = undefined, colors = undefined, icon, action }) => (
-  <button style={{
+  <button style={ {
     backgroundColor: active === undefined
       ? 'black' : active
         ? colors.active : colors.inactive
-  }}
-          onClick={action}>
+  } }
+          onClick={ action }>
     <div>
-      <i style={{
+      <i style={ {
         color: active === undefined
           ? 'white' : !active && colors
             ? colors.active : colors.inactive
-      }}
-         className={`fas fa-${icon}`}/>
+      } }
+         className={ `fas fa-${ icon }` }/>
     </div>
   </button>
 );
